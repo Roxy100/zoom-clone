@@ -31,14 +31,27 @@ const sockets = [];
 // on method는 event가 발동하는 거 기다림. backend에 연결된 사람의 정보를 제공해줌.
 wss.on("connection", (socket) => {
   sockets.push(socket);
+  // nickname을 정하지 않은 사람들.
+  socket["nickname"] = "Anon";
   // 브라우저가 연결되면,
   console.log("Connected to Browser ✅");
   // 브라우저가 꺼졌을 때를 위한 listener 등록(close)
   socket.on("close", onSocketClose);
   // 브라우저가 서버에 메세지를 보냈을 때를 위한 listener 등록(message)
   // 각 브라우저 - aSocket
-  socket.on("message", (message) => {
-    sockets.forEach((aSocket) => aSocket.send(message.toString()));
+  socket.on("message", (msg) => {
+    const message = JSON.parse(msg);
+    switch (message.type) {
+      // new_message이면 자신과 다른 브라우저에 전송됨.
+      case "new_message":
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname}: ${message.payload}`)
+        );
+      // nickname을 socket안에 넣어 줘야 socket이 누구인지 알 수 있기 때문에
+      case "nickname":
+        socket["nickname"] = message.payload;
+        break;
+    }
   });
 });
 
