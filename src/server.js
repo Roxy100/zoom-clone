@@ -19,4 +19,11 @@ const server = http.createServer(app);
 // HTTP서버 위에 새로운 webSocket서버를 만들 수 있다. (server를 전달 수 있도록)
 const wss = new WebSocket.Server({ server });
 
+// socket은 서버와 브라우저사이의 연결. 즉. 연결된 브라우저.
+function handleConnection(socket) {
+  console.log(socket);
+}
+// on method는 event가 발동하는 거 기다림. backend에 연결된 사람의 정보를 제공해줌.
+wss.on("connection", handleConnection);
+
 server.listen(3000, handleListen);
