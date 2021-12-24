@@ -1,3 +1,6 @@
+const messageList = document.querySelector("ul");
+const messageForm = document.querySelector("form");
+
 // socket은 서버로의 연결.
 const socket = new WebSocket(`ws://${window.location.host}`);
 
@@ -9,7 +12,9 @@ socket.addEventListener("open", () => {
 
 // message를 받을 때마다 내용을 출력하는 message.
 socket.addEventListener("message", (message) => {
-  console.log("New message: ", message.data);
+  const li = document.createElement("li");
+  li.innerText = message.data;
+  messageList.append(li);
 });
 
 // 서버가 오프라인이 됐을 때
@@ -17,6 +22,11 @@ socket.addEventListener("close", () => {
   console.log("Disconnected from Server ❌");
 });
 
-setTimeout(() => {
-  socket.send("hello from the browser!");
-}, 10000);
+function handleSubmit(event) {
+  event.preventDefault();
+  const input = messageForm.querySelector("input");
+  socket.send(input.value);
+  input.value = "";
+}
+
+messageForm.addEventListener("submit", handleSubmit);
