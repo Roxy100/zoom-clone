@@ -13,3 +13,10 @@ Zoom Clone using NodeJS, WebRTC and Websockets.
 - WebSockets : 브라우저가 서버로 WebSocket request를 보내면, 서버가 받거나 거절하기를 한다. 이런 [악수]가 한 번 성립(establish)이 되는 것. 이 성립이 되면, [양방향연결]이 생김. 연결이 되어있기 때문에, 메시지를 보내고 받고, 또 원하는 만큼 할 수도 있고, 순서도 상관없다. request-response 같은 건 필요없다.
   - 브라우저에는 내장된 WebSocket API가 있다.
   - ws : implementation일 뿐. webSocket의 핵심부분.
+
+---
+
+## SocketIO vs WebSockets
+
+- SocketIO : WebSocket을 실행하는 게 아니라 가끔 WebSocket을 이용해서 실시간, 양방향, event 기반 통신을 제공하는 framework이다. 'WebSocket의 부가기능'이 아니다. WebSocket이용이 불가능해지면, 다른 방법(것)을 이용해서 계속 작동할 것이다.
+  - front-end 와 back-end에 socketIO를 설치해주어야 한다.
