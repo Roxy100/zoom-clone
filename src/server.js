@@ -19,12 +19,15 @@ const httpServer = http.createServer(app);
 // HTTP서버 위에 새로운 SocketIO서버로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
 const wsServer = SocketIO(httpServer);
 
+// Back-end에서 이 backendDone()에 argument를 보낼 수 있다. (msg)
+// 15초 후에 Back-end는 done()을 argument와 같이 call하게 됨.
+// 결과 : The backend says: hello from the backend
 wsServer.on("connection", (socket) => {
-  socket.on("enter_room", (msg, done) => {
-    console.log(msg);
+  socket.on("enter_room", (roomName, done) => {
+    console.log(roomName);
     setTimeout(() => {
-      done();
-    }, 10000);
+      done("hello from the backend");
+    }, 15000);
   });
 });
 

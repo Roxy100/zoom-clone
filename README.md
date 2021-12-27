@@ -22,17 +22,17 @@ Zoom Clone using NodeJS, WebRTC and Websockets.
   - front-end 와 back-end에 socketIO를 설치해주어야 한다.
   - [SocketIO작성법] 예시
     Front-end에서,
-    socket.emit()의 1번재 argument에는 커스텀한 event이름의 text(string)
-    socket.emit()의 2번째 argument에는 (어떤 것이든 전송할 수 있는) 보내고 싶은 payload.(JSON Object) [여러가지를 보낼 수 있다.]
-    socket.emit()의 마지막 argument에는 서버에서 호출하는 Callback function
+    - socket.emit()의 1번재 argument에는 커스텀한 event이름의 text(string)
+    - socket.emit()의 2번째 argument에는 (어떤 것이든 전송할 수 있는) 보내고 싶은 payload.(JSON Object) [여러가지를 보낼 수 있다.]
+    - socket.emit()의 마지막 argument에는 서버에서 호출하는 Callback function
     ```
      socket.emit("enter_room", { payload: input.value }, () => {
      console.log("server is done!");
      });
     ```
   - Back-end에서,
-    socket.on()의 1번째 argument에는 커스텀한 event이름의 text(string)
-    socket.on()의 2번째 argument인 done이라는 function을 10초 뒤 호출하면서 front-end에서 그 함수가 실행되는 것.
+    - socket.on()의 1번째 argument에는 커스텀한 event이름의 text(string)
+    - socket.on()의 2번째 argument인 done이라는 function을 10초 뒤 호출하면서 front-end에서 그 함수가 실행되는 것.
     ```
      socket.on("enter_room", (msg, done) => {
      console.log(msg);
