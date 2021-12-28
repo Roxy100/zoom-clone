@@ -28,7 +28,8 @@ wsServer.on("connection", (socket) => {
   });
 
   // 방 입장
-  socket.on("enter_room", (roomName, done) => {
+  socket.on("enter_room", (roomName, nickname, done) => {
+    socket["nickname"] = nickname;
     // roomName으로 방에 참가해보자.
     socket.join(roomName);
     done();

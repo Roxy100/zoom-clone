@@ -2,7 +2,7 @@
 const socket = io();
 
 const welcome = document.getElementById("welcome");
-const form = welcome.querySelector("form");
+const enterForm = welcome.querySelector("form");
 const room = document.getElementById("room");
 
 // 방은 처음에 사라진 상태에서,
@@ -52,15 +52,19 @@ function showRoom() {
   nicknameForm.addEventListener("submit", handleNicknameSubmit);
 }
 
+// 유저가 닉네임과 방 입력 후 방 입장하기
 function handleRoomSubmit(event) {
   event.preventDefault();
-  const input = form.querySelector("input");
-  socket.emit("enter_room", input.value, showRoom);
-  roomName = input.value; // (2)
-  input.value = "";
+  const roomNameInput = enterForm.querySelector("#roomName");
+  const nickNameInput = enterForm.querySelector("#nickname");
+  socket.emit("enter_room", roomNameInput.value, nickNameInput.value, showRoom);
+  roomName = roomNameInput.value;
+  roomNameInput.value = "";
+  const changeNameInput = room.querySelector("#nickname input");
+  changeNameInput.value = nickNameInput.value;
 }
 
-form.addEventListener("submit", handleRoomSubmit);
+enterForm.addEventListener("submit", handleRoomSubmit);
 
 // emit("welcome")에 반응하도록 Front-end에선, 수많은 메시지를 보여준다.
 // 누군가 입장했어!
