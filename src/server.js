@@ -29,9 +29,16 @@ wsServer.on("connection", (socket) => {
     // roomName으로 방에 참가해보자.
     socket.join(roomName);
     done();
-    // (참고) socket이 어떤 방에 있느지 알기 위해서는 socket.rooms를 하면된다.
-    // 결과 예시 : set(2) {'DgDuEiVWPvEiaJegAAAd', 'roxy'}
-    // console.log(socket.rooms);
+    // 참가한 모든 사람에게 room Message 보내기
+    socket.to(roomName).emit("welcome");
+  });
+  // 'disconnecting' 은 고객이 접속을 중단할 것(ex.창 닫기)이지만 아직 방을 완전히 나가지는 않은 것을 의미.
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+  });
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", msg);
+    done();
   });
 });
 
