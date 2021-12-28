@@ -1,5 +1,6 @@
 import http from "http";
-import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express";
 
 const app = express();
@@ -16,8 +17,18 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 // HTTP서버에 접근할 수 있게, 이 httpServer에서,
 const httpServer = http.createServer(app);
 
-// HTTP서버 위에 새로운 SocketIO서버로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
-const wsServer = SocketIO(httpServer);
+// HTTP서버 위에 새로운 Server로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
+// 온라인 데모가 작동할 수 있게끔 origin URL에서 작동되는 환경설정
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  },
+});
+
+instrument(wsServer, {
+  auth: false,
+});
 
 // public rooms를 주는 함수
 // socket의 Id를 뜻하는 sids.

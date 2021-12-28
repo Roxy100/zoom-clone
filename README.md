@@ -133,3 +133,23 @@ rooms.forEach((_, key) => {
   food.size
   > 2
   ```
+
+### Admin Panel
+
+- Socket.IO 백엔드를 위한 것! Admin UI!!!
+- https://admin.socket.io ㄱㄱ !
+- Server URL : 로컬호스트/admin
+  - Server
+  ```
+  const wsServer = new Server(httpServer, {
+  cors: {
+  origin: ["https://admin.socket.io"],
+  credentials: true,
+  },
+  });
+  instrument(wsServer, {
+  auth: false,
+  });
+  ```
+
+---
