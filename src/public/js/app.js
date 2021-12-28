@@ -3,17 +3,28 @@ const socket = io();
 
 const welcome = document.getElementById("welcome");
 const form = welcome.querySelector("form");
+const room = document.getElementById("room");
 
-// 한번 더! Front-end에서 실행된 코드는 Back-end가 실행을 시킨 것임.
-// server.js에서 done()호출 때문에.
-function backendDone(msg) {
-  console.log(`The backend says: `, msg);
+// 방은 처음에 사라진 상태에서,
+room.hidden = true;
+
+// 참가한 방에 있는 사람들한테 누가 참가했는지. (1)
+let roomName;
+
+// 참가한 방에 들어가게 되면,
+function showRoom() {
+  welcome.hidden = true;
+  room.hidden = false;
+  // 방 이름 표시
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName}`;
 }
 
 function handleRoomSubmit(event) {
   event.preventDefault();
   const input = form.querySelector("input");
-  socket.emit("enter_room", input.value, backendDone);
+  socket.emit("enter_room", input.value, showRoom);
+  roomName = input.value; // (2)
   input.value = "";
 }
 

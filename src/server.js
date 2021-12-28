@@ -19,15 +19,19 @@ const httpServer = http.createServer(app);
 // HTTP서버 위에 새로운 SocketIO서버로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
 const wsServer = SocketIO(httpServer);
 
-// Back-end에서 이 backendDone()에 argument를 보낼 수 있다. (msg)
-// 15초 후에 Back-end는 done()을 argument와 같이 call하게 됨.
-// 결과 : The backend says: hello from the backend
+// onAny 는 어느 event에서든지 console.log를 할 수 있다.
+// 결과 : Socket Event: enter_room
 wsServer.on("connection", (socket) => {
+  socket.onAny((event) => {
+    console.log(`Socket Event: ${event}`);
+  });
   socket.on("enter_room", (roomName, done) => {
-    console.log(roomName);
-    setTimeout(() => {
-      done("hello from the backend");
-    }, 15000);
+    // roomName으로 방에 참가해보자.
+    socket.join(roomName);
+    done();
+    // (참고) socket이 어떤 방에 있느지 알기 위해서는 socket.rooms를 하면된다.
+    // 결과 예시 : set(2) {'DgDuEiVWPvEiaJegAAAd', 'roxy'}
+    // console.log(socket.rooms);
   });
 });
 
