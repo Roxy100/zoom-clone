@@ -19,10 +19,28 @@ const httpServer = http.createServer(app);
 // HTTP서버 위에 새로운 SocketIO서버로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
 const wsServer = SocketIO(httpServer);
 
+// public rooms를 주는 함수
+// socket의 Id를 뜻하는 sids.
+function publicRooms() {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = wsServer;
+  // public rooms list 만들기
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+  return publicRooms;
+}
+
 // onAny 는 어느 event에서든지 console.log를 할 수 있다.
 // 결과 : Socket Event: enter_room
 wsServer.on("connection", (socket) => {
-  socket["nickname"] = "Anonymous";
+  wsServer.sockets.emit("room_change", publicRooms());
   socket.onAny((event) => {
     console.log(`Socket Event: ${event}`);
   });
@@ -35,14 +53,20 @@ wsServer.on("connection", (socket) => {
     done();
     // 참가한 모든 사람에게 room Message 보내기
     socket.to(roomName).emit("welcome", socket.nickname);
+    // 모든 방에게 새로운 방이 만들어졌다고 공지 Message 보내기
+    wsServer.sockets.emit("room_change", publicRooms());
   });
 
   // 방 퇴장
-  // 'disconnecting' 은 고객이 접속을 중단할 것(ex.창 닫기)이지만 아직 방을 완전히 나가지는 않은 것을 의미.
+  // 'disconnecting' 은 고객이 접속을 중단할 것(ex.창 닫기)이지만 아직 연결이 끊어지지 않은 그 찰나에 발생하는 것. (room정보가 살아있음.)
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit("bye", socket.nickname)
     );
+  });
+  // 'disconnect' 은  연결이 완전히 끊어졌을 때 발생한는 것.(room 정보가 비어있음.)
+  socket.on("disconnect", () => {
+    wsServer.sockets.emit("room_change", publicRooms());
   });
 
   // 방_메시지

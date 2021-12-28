@@ -79,3 +79,16 @@ socket.on("bye", (user) => {
 
 // 누군가가 메시지 추가했네~
 socket.on("new_message", addMessage);
+
+// 누군가가 새로운 방 입장했네~ 열려있는 모든 방의 list를 볼 수 있어~
+socket.on("room_change", (rooms) => {
+  const roomList = welcome.querySelector("ul");
+  // 방 목록을 비워줘서 항상 새로운 list가 되도록 하기.
+  roomList.innerHTML = "";
+  // 모든 방의 배열을 보여주기.
+  rooms.forEach((room) => {
+    const li = document.createElement("li");
+    li.innerText = room;
+    roomList.append(li);
+  });
+});

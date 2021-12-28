@@ -41,3 +41,82 @@ Zoom Clone using NodeJS, WebRTC and Websockets.
      }, 10000);
      });
     ```
+
+---
+
+### Adapter
+
+- Adapter가 기본적으로 하는 일은 다른 서버들 사이에 실시간 어플리케이션을 동기화하는 것.
+  - MongoDB를 사용해서 서버간의 통신을 해주는 것.
+  - 어플리케이션으로 통하는 [창문]과 같은 역할.
+  - 누가 연결되었는지, 현재 어플리케이션에 room이 얼마나 있는지 알려준다.
+
+### Map & Set 구조
+
+<Map 구조>
+
+- 예시
+
+  ```
+   const food = new Map()
+   < undefined
+   food
+   < Map(0) {size: 0}
+   food.set("pizza", 12)
+   < Map(1) {'pizza' => 12}
+   food.get("pizza")
+   < 12
+   food.get("lalala")
+   < undefined
+  ```
+
+- 본격적인 예시
+
+  ```
+   const sids = new Map()
+   < undefined
+   sids.set("R98ps0fmEt4Dr1_lAAAB", true)
+   < Map(1) {'R98ps0fmEt4Dr1_lAAAB' => true}
+   sids.set("6rmYq1v33daN8xhFAAAF", true)
+   < Map(2) {'R98ps0fmEt4Dr1_lAAAB' => true, '6rmYq1v33daN8xhFAAAF' => true}
+   sids
+   < Map(2) {'R98ps0fmEt4Dr1_lAAAB' => true, '6rmYq1v33daN8xhFAAAF' => true}
+   const rooms = new Map()
+   < undefined
+   rooms.set("R98ps0fmEt4Dr1_lAAAB", true)
+   < Map(1) {'R98ps0fmEt4Dr1_lAAAB' => true}
+   rooms.set("6rmYq1v33daN8xhFAAAF", true)
+   < Map(2) {'R98ps0fmEt4Dr1_lAAAB' => true, '6rmYq1v33daN8xhFAAAF' => true}
+   rooms.set("roxy", true)
+   < Map(3) {'R98ps0fmEt4Dr1_lAAAB' => true, '6rmYq1v33daN8xhFAAAF' => true, 'roxy' => true}
+  ```
+
+#### 모든 socket은 private room이 있다는 걸 기억하기!
+
+- sids : 서버에 연결된 모든 sockets들의 map
+- rooms : public room 2개와 private room 'roxy'
+  - room id = socket id
+
+#### map을 반복하거나 살펴볼 수 있는지 확인
+
+```
+ rooms.forEach((value,key)=> console.log(value,key))
+ true 'R98ps0fmEt4Dr1_lAAAB'
+ true '6rmYq1v33daN8xhFAAAF'
+ true 'roxy'
+```
+
+#### map 안에 있는 것을 가져오기
+
+- get과 'key'를 이용해서 key가 socketID인지 아니면 방 제목인지 알 수 있도록.
+- private room이 아닌 방만 찾음.
+
+```
+rooms.forEach((_, key) => {
+    if(sids.get(key) === undefined){
+    console.log(key)
+    }
+})
+```
+
+결과 : roxy
