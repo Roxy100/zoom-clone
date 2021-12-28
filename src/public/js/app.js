@@ -68,12 +68,16 @@ enterForm.addEventListener("submit", handleRoomSubmit);
 
 // emit("welcome")에 반응하도록 Front-end에선, 수많은 메시지를 보여준다.
 // 누군가 입장했어!
-socket.on("welcome", (user) => {
+socket.on("welcome", (user, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName} (${newCount})`;
   addMessage(`${user} arrived!`);
 });
 
 // 누군가 떠났어 ㅠㅠ
-socket.on("bye", (user) => {
+socket.on("bye", (user, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName} (${newCount})`;
   addMessage(`${user} left ㅠㅠ`);
 });
 

@@ -120,3 +120,16 @@ rooms.forEach((_, key) => {
 ```
 
 결과 : roxy
+
+<Set 구조>
+
+- 예시
+
+  ```
+  const food = new Set(["pizza","love","love"])
+  > undefined
+  food
+  > Set(2) {'pizza', 'love'}
+  food.size
+  > 2
+  ```
