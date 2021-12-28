@@ -16,8 +16,11 @@ html(lang="en")
                     button Enter Room
             div#room
                 h3
-                ul 
-                form
+                ul
+                form#nickname
+                    input(placeholder="nickname", required, type="text")
+                    button Save 
+                form#msg
                     input(placeholder="message", required, type="text")
                     button Send
         //- front-end에 socketIO를 설치해줌.

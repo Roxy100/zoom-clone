@@ -19,14 +19,22 @@ function addMessage(message) {
   ul.appendChild(li);
 }
 
+// 방_메시지
 function handleMessageSubmit(event) {
   event.preventDefault();
-  const input = room.querySelector("input");
-  const value = input.value;
-  socket.emit("new_message", input.value, roomName, () => {
+  const input = room.querySelector("#msg input");
+  const { value } = input;
+  socket.emit("new_message", value, roomName, () => {
     addMessage(`You: ${value}`);
   });
   input.value = "";
+}
+
+// 방_닉네임
+function handleNicknameSubmit(event) {
+  event.preventDefault();
+  const input = room.querySelector("#nickname input");
+  socket.emit("nickname", input.value);
 }
 
 // 참가한 방에 들어가게 되면,
@@ -36,9 +44,12 @@ function showRoom() {
   // 방 이름 표시
   const h3 = room.querySelector("h3");
   h3.innerText = `Room ${roomName}`;
-  // 방 메시지 표시
-  const form = room.querySelector("form");
-  form.addEventListener("submit", handleMessageSubmit);
+  // 방_메시지 표시
+  const msgForm = room.querySelector("#msg");
+  // 방_닉네임 표시
+  const nicknameForm = room.querySelector("#nickname");
+  msgForm.addEventListener("submit", handleMessageSubmit);
+  nicknameForm.addEventListener("submit", handleNicknameSubmit);
 }
 
 function handleRoomSubmit(event) {
@@ -53,13 +64,13 @@ form.addEventListener("submit", handleRoomSubmit);
 
 // emit("welcome")에 반응하도록 Front-end에선, 수많은 메시지를 보여준다.
 // 누군가 입장했어!
-socket.on("welcome", () => {
-  addMessage("Someone joined!");
+socket.on("welcome", (user) => {
+  addMessage(`${user} arrived!`);
 });
 
 // 누군가 떠났어 ㅠㅠ
-socket.on("bye", () => {
-  addMessage("Someone left ㅠㅠ");
+socket.on("bye", (user) => {
+  addMessage(`${user} left ㅠㅠ`);
 });
 
 // 누군가가 메시지 추가했네~

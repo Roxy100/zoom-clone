@@ -22,24 +22,36 @@ const wsServer = SocketIO(httpServer);
 // onAny 는 어느 event에서든지 console.log를 할 수 있다.
 // 결과 : Socket Event: enter_room
 wsServer.on("connection", (socket) => {
+  socket["nickname"] = "Anonymous";
   socket.onAny((event) => {
     console.log(`Socket Event: ${event}`);
   });
+
+  // 방 입장
   socket.on("enter_room", (roomName, done) => {
     // roomName으로 방에 참가해보자.
     socket.join(roomName);
     done();
     // 참가한 모든 사람에게 room Message 보내기
-    socket.to(roomName).emit("welcome");
+    socket.to(roomName).emit("welcome", socket.nickname);
   });
+
+  // 방 퇴장
   // 'disconnecting' 은 고객이 접속을 중단할 것(ex.창 닫기)이지만 아직 방을 완전히 나가지는 않은 것을 의미.
   socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
   });
+
+  // 방_메시지
   socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", msg);
+    socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
     done();
   });
+
+  // 방_닉네임
+  socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
 });
 
 // function onSocketClose() {
