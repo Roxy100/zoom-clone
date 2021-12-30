@@ -20,15 +20,19 @@ const wsServer = SocketIO(httpServer);
 // 서버 연결
 wsServer.on("connection", (socket) => {
   // 방 참가
-  socket.on("join_room", (roomName, done) => {
+  socket.on("join_room", (roomName) => {
     socket.join(roomName);
-    done();
     socket.to(roomName).emit("welcome");
   });
 
   // Offer 서버
   socket.on("offer", (offer, roomName) => {
     socket.to(roomName).emit("offer", offer);
+  });
+
+  // Answer 서버
+  socket.on("answer", (answer, roomName) => {
+    socket.to(roomName).emit("answer", answer);
   });
 });
 

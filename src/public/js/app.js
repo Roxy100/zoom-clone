@@ -115,7 +115,7 @@ const welcomeForm = welcome.querySelector("form");
 
 // 양쪽 브라우저에서 돌아가는 Code
 // welcome form은 숨기고, phone call을 보여주며 카메라,마이크 등 화면 불러오기
-async function startMedia() {
+async function initCall() {
   welcome.hidden = true;
   call.hidden = false;
   await getMedia();
@@ -123,10 +123,11 @@ async function startMedia() {
 }
 
 // Welcome 화면에서 방에 참가하기
-function handleWelcomeSubmit(event) {
+async function handleWelcomeSubmit(event) {
   event.preventDefault();
   const input = welcomeForm.querySelector("input");
-  socket.emit("join_room", input.value, startMedia);
+  await initCall(); // Media를 가져오는 속도가 연결을 만드는 속도보다 빠르기 때문에 변경.
+  socket.emit("join_room", input.value);
   roomName = input.value;
   input.value = "";
 }
@@ -143,9 +144,17 @@ socket.on("welcome", async () => {
   socket.emit("offer", offer, roomName); // offer 전송
 });
 
-// Peer B에서 실행되는 코드.
-socket.on("offer", (offer) => {
-  console.log(offer);
+// Peer B가 offer를 받아서 Peer B에서 실행되는 코드.
+socket.on("offer", async (offer) => {
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer();
+  myPeerConnection.setLocalDescription(answer);
+  socket.emit("answer", answer, roomName); // answer 전송
+});
+
+// Peer B로부터 받은 answer로 인해 Peer A에서 실행되는 코드.
+socket.on("answer", (answer) => {
+  myPeerConnection.setRemoteDescription(answer);
 });
 
 // <RTC Code >
