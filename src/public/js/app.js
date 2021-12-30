@@ -135,8 +135,17 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 // < Socket Code >
 
-socket.on("welcome", () => {
-  console.log("someone joined");
+// Peer B가 방에 참가하면, Peer A에서 실행되는 코드.
+socket.on("welcome", async () => {
+  const offer = await myPeerConnection.createOffer();
+  myPeerConnection.setLocalDescription(offer);
+  console.log("sent the offer");
+  socket.emit("offer", offer, roomName); // offer 전송
+});
+
+// Peer B에서 실행되는 코드.
+socket.on("offer", (offer) => {
+  console.log(offer);
 });
 
 // <RTC Code >
