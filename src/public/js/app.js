@@ -101,7 +101,18 @@ function handleCameraClick() {
 
 // <카메라 전환> - 사용하려는 특정 카메라 Id 전송 [select 변경]
 async function handleCameraChange() {
+  // 비디오 device의 새로운 id로 다시 또 다른 stream을 생성함.
   await getMedia(camerasSelect.value);
+  if (myPeerConnection) {
+    // 내가 선택한 새로운 장치로 업데이트 된 비디오Track을 받는다.
+    const videoTrack = myStream.getVideoTracks()[0]; // 나 자신을 위한 my Stream
+    // Sender : 우리의 peer로 보내진 media stream track을 컨트롤하게 해주는 역할.
+    // track:{kind:"video"}를 가진 Sender를 찾아서 getSender 한다.
+    const videoSender = myPeerConnection
+      .getSenders()
+      .find((sender) => sender.track.kind === "video"); // 다른 브라우저로 보내진 비디오와 오디오 데이터를 보내는 컨트롤
+    videoSender.replaceTrack(videoTrack); // Sender를 videoTrack으로 바꾼다.
+  }
 }
 
 muteBtn.addEventListener("click", handleMuteClick);
@@ -176,6 +187,8 @@ function makeConnection() {
   // [ Ice (Interactive Connectivity Establishment) : 인터넷 연결 생성 ]
   // [ Candidate : 브라우저가 '헤이,이게 우리가 소통하는 방법이야'라고 알려주는 방식. ]
   myPeerConnection.addEventListener("icecandidate", handleIce);
+  // 양쪽 브라우저의 stream을 주고 받음.
+  myPeerConnection.addEventListener("addstream", handleAddStream);
   // 양쪽 브라우저에서 카메라,마이크의 데이터 stream을 받아서 myPeerConnection안에 집어넣었음.
   myStream
     .getTracks()
@@ -186,4 +199,10 @@ function makeConnection() {
 function handleIce(data) {
   console.log("sent candidate");
   socket.emit("ice", data.candidate, roomName);
+}
+
+// Peer A Peer B 브라우저의 stream을 서로 주고 받는 실행코드.
+function handleAddStream(data) {
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream; // 다른 브라우저의 stream
 }
