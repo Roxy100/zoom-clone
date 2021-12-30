@@ -17,8 +17,9 @@ const httpServer = http.createServer(app);
 // HTTP서버 위에 새로운 wsServer로 wsServer(io)를 볼 수 있다. (httpServer를 전달 수 있도록)
 const wsServer = SocketIO(httpServer);
 
-// 방 참가
+// 서버 연결
 wsServer.on("connection", (socket) => {
+  // 방 참가
   socket.on("join_room", (roomName, done) => {
     socket.join(roomName);
     done();

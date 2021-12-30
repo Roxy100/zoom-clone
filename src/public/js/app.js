@@ -16,6 +16,7 @@ let myStream;
 let muted = false;
 let cameraOff = false;
 let roomName;
+let myPeerConnection; // 이 연결을 모든곳에 공유
 
 // <카메라 목록을 만들게 되면, 유저가 종류 선택해서 가져오기>
 async function getCameras() {
@@ -112,11 +113,13 @@ camerasSelect.addEventListener("input", handleCameraChange);
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form");
 
+// 양쪽 브라우저에서 돌아가는 Code
 // welcome form은 숨기고, phone call을 보여주며 카메라,마이크 등 화면 불러오기
-function startMedia() {
+async function startMedia() {
   welcome.hidden = true;
   call.hidden = false;
-  getMedia();
+  await getMedia();
+  makeConnection();
 }
 
 // Welcome 화면에서 방에 참가하기
@@ -135,3 +138,15 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 socket.on("welcome", () => {
   console.log("someone joined");
 });
+
+// <RTC Code >
+
+// 실제로 연결통로를 만드는 함수
+function makeConnection() {
+  // 양쪽 브라우저에서 peer-to-peer 연결 만듦.
+  myPeerConnection = new RTCPeerConnection();
+  // 양쪽 브라우저에서 카메라,마이크의 데이터 stream을 받아서 myPeerConnection안에 집어넣었음.
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
