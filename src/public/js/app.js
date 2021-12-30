@@ -146,15 +146,24 @@ socket.on("welcome", async () => {
 
 // Peer B가 offer를 받아서 Peer B에서 실행되는 코드.
 socket.on("offer", async (offer) => {
+  console.log("received the offer");
   myPeerConnection.setRemoteDescription(offer);
   const answer = await myPeerConnection.createAnswer();
   myPeerConnection.setLocalDescription(answer);
   socket.emit("answer", answer, roomName); // answer 전송
+  console.log("sent the answer");
 });
 
 // Peer B로부터 받은 answer로 인해 Peer A에서 실행되는 코드.
 socket.on("answer", (answer) => {
+  console.log("received the answer");
   myPeerConnection.setRemoteDescription(answer);
+});
+
+// Peer A or Peer B 브라우저가 candidate들을 서로 받는 실행코드.
+socket.on("ice", (ice) => {
+  console.log("received candidate");
+  myPeerConnection.addIceCandidate(ice);
 });
 
 // <RTC Code >
@@ -163,8 +172,18 @@ socket.on("answer", (answer) => {
 function makeConnection() {
   // 양쪽 브라우저에서 peer-to-peer 연결 만듦.
   myPeerConnection = new RTCPeerConnection();
+  // IceCandidate - 브라우저가 서로 소통할 수 있게 해주는 방법
+  // [ Ice (Interactive Connectivity Establishment) : 인터넷 연결 생성 ]
+  // [ Candidate : 브라우저가 '헤이,이게 우리가 소통하는 방법이야'라고 알려주는 방식. ]
+  myPeerConnection.addEventListener("icecandidate", handleIce);
   // 양쪽 브라우저에서 카메라,마이크의 데이터 stream을 받아서 myPeerConnection안에 집어넣었음.
   myStream
     .getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
+
+// Peer A or Peer B 브라우저가 candidate들을 서로 주는 실행코드.
+function handleIce(data) {
+  console.log("sent candidate");
+  socket.emit("ice", data.candidate, roomName);
 }
