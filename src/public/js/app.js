@@ -182,7 +182,21 @@ socket.on("ice", (ice) => {
 // 실제로 연결통로를 만드는 함수
 function makeConnection() {
   // 양쪽 브라우저에서 peer-to-peer 연결 만듦.
-  myPeerConnection = new RTCPeerConnection();
+  // STUN 서버 : 너의 장치에 공용 IP를 알려주는 서버. [양쪽 브라우저가 서로 다른 네트워크에 있을 때 필요]
+  // 일단은, 구글이 무료로 제공하는 STUN 서버
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ],
+      },
+    ],
+  });
   // IceCandidate - 브라우저가 서로 소통할 수 있게 해주는 방법
   // [ Ice (Interactive Connectivity Establishment) : 인터넷 연결 생성 ]
   // [ Candidate : 브라우저가 '헤이,이게 우리가 소통하는 방법이야'라고 알려주는 방식. ]
