@@ -6,9 +6,16 @@ const muteBtn = document.getElementById("mute");
 const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
 
+// < Phone call Code >
+const call = document.getElementById("call");
+
+// 처음 call화면은 숨기고,
+call.hidden = true;
+
 let myStream;
 let muted = false;
 let cameraOff = false;
+let roomName;
 
 // <카메라 목록을 만들게 되면, 유저가 종류 선택해서 가져오기>
 async function getCameras() {
@@ -61,8 +68,6 @@ async function getMedia(deviceId) {
   }
 }
 
-getMedia();
-
 // <Mute 버튼 생성>
 function handleMuteClick() {
   // 오디오Track 생성
@@ -101,3 +106,32 @@ async function handleCameraChange() {
 muteBtn.addEventListener("click", handleMuteClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 camerasSelect.addEventListener("input", handleCameraChange);
+
+// < Welcome Form (방에 참가하기) Code >
+
+const welcome = document.getElementById("welcome");
+const welcomeForm = welcome.querySelector("form");
+
+// welcome form은 숨기고, phone call을 보여주며 카메라,마이크 등 화면 불러오기
+function startMedia() {
+  welcome.hidden = true;
+  call.hidden = false;
+  getMedia();
+}
+
+// Welcome 화면에서 방에 참가하기
+function handleWelcomeSubmit(event) {
+  event.preventDefault();
+  const input = welcomeForm.querySelector("input");
+  socket.emit("join_room", input.value, startMedia);
+  roomName = input.value;
+  input.value = "";
+}
+
+welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+
+// < Socket Code >
+
+socket.on("welcome", () => {
+  console.log("someone joined");
+});
