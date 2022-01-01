@@ -1,0 +1,17 @@
+body {
+  background-color: lightblue;
+  color: #333;
+}
+#welcome form {
+  border: 8px inset violet;
+}
+#myStream {
+  display: flex;
+  justify-content: center;
+}
+#myStream h3 {
+  margin: 20px;
+}
+#mute {
+  margin-right: 10px;
+}
